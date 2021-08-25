@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 import os
 import telebot
+import traceback
 from django.utils import timezone
 from telebot import types
 
@@ -11,22 +12,16 @@ bot = telebot.TeleBot(os.getenv('TELEGRAMKEY'))
 
 @bot.message_handler(commands=['start'])
 def start_command(message):
-    if message.from_user.first_name:
-        fn = message.from_user.first_name
-    else:
-        fn = '-'
-    if message.from_user.last_name:
-        ln = message.from_user.last_name
-    else:
-        ln = '-'
+
     try:
-        TelegramUser.objects.create(first_name=message.from_user.first_name,
-                                    last_name=message.from_user.last_name,
+        TelegramUser.objects.create(first_name=message.json['from'].get('first_name', '-'),
+                                    last_name=message.json['from'].get('last_name', '-'),
                                     chat_id=message.from_user.chat_id,
                                     last_message=timezone.now()
                                     )
     except:
-        pass
+        print(traceback.format_exc())
+        
     bot.send_message(message.chat.id, 'Доброго дня, я бот програми Weld Calculator', reply_markup=main_key)
 
 
