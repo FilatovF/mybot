@@ -3,7 +3,7 @@ import os
 import telebot
 from django.utils import timezone
 from telebot import types
-
+import traceback
 from mybot.models import TelegramUser
 
 bot = telebot.TeleBot(os.getenv('TELEGRAMKEY'))
@@ -20,13 +20,13 @@ def start_command(message):
     else:
         ln = '-'
     try:
-        TelegramUser.objects.create(first_name=message.from_user.first_name,
-                                    last_name=message.from_user.last_name,
+        TelegramUser.objects.create(first_name=fn,
+                                    last_name=ln,
                                     chat_id=message.from_user.chat_id,
                                     last_message=timezone.now()
                                     )
     except:
-        pass
+        print(traceback.format_exc())
     bot.send_message(message.chat.id, 'Доброго дня, я бот програми Weld Calculator', reply_markup=main_key)
 
 
